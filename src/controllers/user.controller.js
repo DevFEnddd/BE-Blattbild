@@ -3,9 +3,9 @@ import UserService from '../services/user.service.js'
 
 
 const loginUser = async (req, res, next) => {
+    const { username, password  } = req.body
 
     try {
-        const { username, password  } = req.body
         if (!username || !password) {
             return res.status(500).json({
                 status: 'ERR',
@@ -21,14 +21,6 @@ const loginUser = async (req, res, next) => {
     }
 }
 
-const updateUser = async (req, res, next) => {
 
-    try {
-       
-    } catch(err) {
-        console.error(err);
-      return next(err);
-    }
-}
 
-export  {loginUser, updateUser};
+export  {loginUser};

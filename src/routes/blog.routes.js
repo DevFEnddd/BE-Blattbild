@@ -1,9 +1,10 @@
 import express from "express";
-import listBlog from "../controllers/blog.controller.js"
-
 const router = express.Router();
 
+import {listBlog, createBlog, updateBlog} from "../controllers/blog.controller.js"
 
-router.post('/blog', listBlog)
+router.post('/', listBlog)
+router.post('/new', createBlog)
+router.put('/update-blog/:slug', updateBlog)
 
 export default router

@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 import { nanoid } from 'nanoid';
 import slugify from 'slugify';
-import mongoosePaginate from 'mongoose-paginate-v2';
-import { articleStatusEnum } from '../enums/articleStatus.enum.js';
+// import mongoosePaginate from 'mongoose-paginate-v2';
+import { blogStatusEnum } from '../enums/blogStatus.enum.js';
 
 const { Schema } = mongoose;
 
@@ -17,15 +17,13 @@ const blogSchema = new Schema(
     },
     thumbnail: {
       type: String,
-      required: true,
       default: 'https://via.placeholder.com/300x300.jpg?text=tmptechnology.vn',
     },
     content: {
       type: String,
     },
     tags: 
-      [{type: Schema.Types.ObjectId,
-        ref: 'Tag',}]
+      {type: String}
     ,
     slug: {
       type: String,
@@ -37,8 +35,8 @@ const blogSchema = new Schema(
     },
     status: {
       type: Number,
-      enum: Object.values(articleStatusEnum),
-      default: articleStatusEnum.PUBLISHED,
+      enum: Object.values(blogStatusEnum),
+      default: blogStatusEnum.PUBLISHED,
     },
   },
   {
@@ -53,7 +51,7 @@ const blogSchema = new Schema(
   }
 );
 
-blogSchema.plugin(mongoosePaginate);
+// blogSchema.plugin(mongoosePaginate);
 
 const Blog = mongoose.model('blog', blogSchema);
 export { Blog };
