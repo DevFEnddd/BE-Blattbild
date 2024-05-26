@@ -1,19 +1,48 @@
 import { Blog } from "../models/blog.model.js";
-import bcrypt from "bcrypt";
 import {genneralAccessToken, refeshAccessToken} from "./jwt.service.js";
+import { blogStatusEnum } from "../enums/blogStatus.enum.js"
+ 
 
-
-let listBlog = (username, password) => {
+let getListBlog = () => {
 
     return new Promise(async (resolve, reject) => {
         try {
-            
+            const blogs = await Blog.find()
+            resolve({
+                status: 200,
+                message: "SUCCESS",
+                data: blogs
+            })
         } catch (err) {
             console.log(err);
             return reject(null, false);
         }
     })
-}
+} //doing
+
+let getDetailBlog = (data) => {
+
+    return new Promise(async (resolve, reject) => {
+        try {
+            const { slug } = data.params;
+            const blog = await Blog.findOne({ slug: slug});
+            if(!blog) {
+                resolve({
+                    status: 500,
+                    message: "The blog is not defined"
+                });
+            }
+            resolve({
+                status: 200,
+                message: "SUCCESS",
+                data: blog,
+            })
+        } catch (err) {
+            console.log(err);
+            return reject(null, false);
+        }
+    })
+} 
 
 let createBlog = (data) => {
 
@@ -97,6 +126,29 @@ let updateBlog = (data) => {
     })
 }
 
+let deleteBlog = () => {
+
+    return new Promise(async (resolve, reject) => {
+        try {
+            const { id } = req.params;
+            const checkDelete = await Blog.findOne({
+                _id: id,
+                status: { $ne: blogStatusEnum.DELETED },
+              });
+            if (!checkDelete) resolve("Blog not found");
+            await Blog.findByIdAndUpdate(id, { $set: { status: blogStatusEnum.DELETED } }, { new: true });
+            resolve({
+                status: 200,
+                message: "Delete Blog Success!"
+            })
+          
+        } catch (err) {
+            console.log(err);
+            return reject(null, false);
+        }
+    })
+} 
 
 
-export default { listBlog, createBlog, updateBlog };
+
+export default { getListBlog, createBlog, updateBlog, getDetailBlog, deleteBlog };

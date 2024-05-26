@@ -1,10 +1,20 @@
-import showListBlog from '../services/blog.service.js'
+import BlogServices from '../services/blog.service.js'
 
 
 const listBlog = async (req, res, next) => {
     try {
-        console.log(req.body)
-        const response = await showListBlog.listBlog()
+        const response = await BlogServices.getListBlog()
+        return res.status(200).json(response)
+    } catch(err) {
+        console.error(err);
+      return next(err);
+    }
+} 
+
+const detailBlog = async (req, res, next ) => {
+
+    try { 
+        const response = await BlogServices.getDetailBlog(req)
         return res.status(200).json(response)
     } catch(err) {
         console.error(err);
@@ -18,10 +28,10 @@ const createBlog = async (req, res, next ) => {
         if (!title) {
             return res.status(500).json({
                 status: 'ERR',
-                message: 'The input is required'
+                message: 'Missing required parameter!'
             })
         }
-        const response = await showListBlog.createBlog(req)
+        const response = await BlogServices.createBlog(req)
         return res.status(200).json(response)
     } catch(err) {
         console.error(err);
@@ -34,7 +44,7 @@ const updateBlog = async (req, res, next ) => {
  
     // const {title, description, thumbnail, content, tags, slug, status} = req.body
     try { 
-        const response = await showListBlog.updateBlog(req)
+        const response = await BlogServices.updateBlog(req)
         return res.status(200).json(response)
     } catch(err) {
         console.error(err);
@@ -42,4 +52,23 @@ const updateBlog = async (req, res, next ) => {
     }
 }
 
-export  {listBlog, createBlog, updateBlog};
+const deleteBlog = async (req, res, next ) => {
+  
+    try {
+        if (!req.params.id) {
+            return res.status(500).json({
+                status: 'ERR',
+                message: 'Missing required parameter!'
+            })
+        }
+        const response = await BlogServices.deleteBlog(req)
+        return res.status(200).json(response)
+    } catch(err) {
+        console.error(err);
+      return next(err);
+    }
+}
+
+
+
+export  {listBlog, createBlog, updateBlog, deleteBlog, detailBlog};

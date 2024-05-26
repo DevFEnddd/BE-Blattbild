@@ -4,7 +4,6 @@ import UserService from '../services/user.service.js'
 
 const loginUser = async (req, res, next) => {
     const { username, password  } = req.body
-
     try {
         if (!username || !password) {
             return res.status(500).json({
@@ -13,7 +12,7 @@ const loginUser = async (req, res, next) => {
             })
         }
         const response = await UserService.loginUser(username, password)
-        console.log("1111",response)
+       
         return res.status(200).json(response)
     } catch(err) {
         console.error(err);
