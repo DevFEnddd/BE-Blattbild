@@ -3,7 +3,8 @@ import BlogServices from '../services/blog.service.js'
 
 const listBlog = async (req, res, next) => {
     try {
-        const response = await BlogServices.getListBlog()
+        const { limit , page } = req.query
+        const response = await BlogServices.getListBlog(Number(limit) , Number(page))
         return res.status(200).json(response)
     } catch(err) {
         console.error(err);

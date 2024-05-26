@@ -3,22 +3,26 @@ import {genneralAccessToken, refeshAccessToken} from "./jwt.service.js";
 import { blogStatusEnum } from "../enums/blogStatus.enum.js"
  
 
-let getListBlog = () => {
+let getListBlog = (limit = 20, page = 0) => {
 
     return new Promise(async (resolve, reject) => {
         try {
-            const blogs = await Blog.find()
+            const totalBlog = await Blog.countDocuments();
+            const blogs = await Blog.find().limit(limit).skip((page * limit) )
             resolve({
                 status: 200,
                 message: "SUCCESS",
-                data: blogs
+                data: blogs,
+                total: totalBlog,
+                pageCurrent: Number(page + 1),
+                totalPage: Math.ceil(totalBlog/limit)
             })
         } catch (err) {
             console.log(err);
             return reject(null, false);
         }
     })
-} //doing
+} 
 
 let getDetailBlog = (data) => {
 
