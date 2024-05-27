@@ -3,8 +3,8 @@ import FormServices from '../services/form.service.js'
 
 const listForm = async (req, res, next) => {
     try {
-        const { limit , page } = req.query
-        const response = await FormServices.getListForm(Number(limit) , Number(page))
+        const { limit , page, search } = req.query
+        const response = await FormServices.getListForm(Number(limit) , Number(page), search)
         return res.status(200).json(response)
     } catch(err) {
         console.error(err);
