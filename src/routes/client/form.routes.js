@@ -1,10 +1,8 @@
 import express from "express";
 const router = express.Router();
 
-import {listForm, detailForm} from "../../controllers/form.controller.js"
-import {authMiddleware} from "../../middleware/authMiddleware.js"
+import {createForm} from "../../controllers/form.controller.js"
 
-router.get('/list',authMiddleware, listForm)
-router.get('/detail-form/:id',authMiddleware, detailForm)
+router.post('/create-form', createForm)
 
 export default router

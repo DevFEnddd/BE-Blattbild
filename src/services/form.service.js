@@ -1,36 +1,23 @@
 import { FormCustomer } from "../models/formCustomer.model.js";
-import { blogStatusEnum } from "../enums/blogStatus.enum.js";
 
-let getListForm = (limit = 20, page = 0, search) => {
+let createForm = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const totalForm = await FormCustomer.countDocuments();
-      if (search) {
-        const formsSearch = await FormCustomer.find({ $regex : search})
-          .limit(limit)
-          .skip(page * limit)
-          .sort({ createdAt: -1 });
+      const { name, email, phone, form, note } = data.body;
+      const newForm = await Blog.create({
+        name,
+        email,
+        phone,
+        form,
+        note,
+      });
+      if (newForm) {
         resolve({
-          status: 200,
-          message: "SUCCESS",
-          data: formsSearch,
-          total: totalForm,
-          pageCurrent: Number(page + 1),
-          totalPage: Math.ceil(totalForm / limit),
+          status: "200",
+          messsage: "SUCCESS",
+          data: newBlog,
         });
       }
-      const forms = await FormCustomer.find()
-        .limit(limit)
-        .skip(page * limit)
-        .sort({ createdAt: -1 });
-      resolve({
-        status: 200,
-        message: "SUCCESS",
-        data: forms,
-        total: totalForm,
-        pageCurrent: Number(page + 1),
-        totalPage: Math.ceil(totalForm / limit),
-      });
     } catch (err) {
       console.log(err);
       return reject(null, false);
@@ -38,27 +25,4 @@ let getListForm = (limit = 20, page = 0, search) => {
   });
 };
 
-let getDetailForm = (data) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const { id } = data.params;
-      const form = await FormCustomer.findOne({ _id: id });
-      if (!form) {
-        resolve({
-          status: 404,
-          message: "Form not found!",
-        });
-      }
-      resolve({
-        status: 200,
-        message: "SUCCESS",
-        data: form,
-      });
-    } catch (err) {
-      console.log(err);
-      return reject(null, false);
-    }
-  });
-};
-
-export default { getListForm, getDetailForm };
+export default { createForm };

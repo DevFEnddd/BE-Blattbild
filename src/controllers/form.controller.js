@@ -1,10 +1,39 @@
 import FormServices from '../services/form.service.js'
 
 
-const listForm = async (req, res, next) => {
+const createForm = async (req, res, next) => {
     try {
-        const { limit , page, search } = req.query
-        const response = await FormServices.getListForm(Number(limit) , Number(page), search)
+        const { name,
+          email,
+          phone,
+          form,
+          note } = req.body
+
+          if (!name) {
+            return res.status(500).json({
+                status: 'ERR',
+                message: 'Validation Name!'
+            })
+          }
+          if (!email) {
+            return res.status(500).json({
+                status: 'ERR',
+                message: 'Validation Email!'
+            })
+          }
+          if (!phone) {
+            return res.status(500).json({
+                status: 'ERR',
+                message: 'Validation Phone!'
+            })
+          }
+          if (!form) {
+            return res.status(500).json({
+                status: 'ERR',
+                message: 'Validation Form!'
+            })
+          }
+        const response = await FormServices.createForm(req)
         return res.status(200).json(response)
     } catch(err) {
         console.error(err);
@@ -12,18 +41,4 @@ const listForm = async (req, res, next) => {
     }
 } 
 
-const detailForm = async (req, res, next ) => {
-
-    try { 
-        const response = await FormServices.getDetailForm(req)
-        return res.status(200).json(response)
-    } catch(err) {
-        console.error(err);
-      return next(err);
-    }
-}
-
-
-
-
-export  {listForm, detailForm};
+export  {createForm};
