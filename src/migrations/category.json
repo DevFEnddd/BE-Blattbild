@@ -1,0 +1,25 @@
+    [ {
+        "title": "Business",
+        "type": 5
+    }, 
+    {
+        "title": "Ecommerce",
+        "type": 4
+    },
+    {
+        "title": "Design",
+        "type": 3
+    },
+    {
+        "title": "Marketing",
+        "type": 2
+    },
+    {
+        "title": "Websites",
+        "type": 1
+    },
+    {
+        "title": "WordPress",
+        "type": 0
+    }
+  ]

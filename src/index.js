@@ -24,9 +24,9 @@ app.use(bodyParser.json())
 
 app.use(cors());
 
-
+/* Routers */
 routes(app)
-
+/* Mongo Connection */
 mongoose.connect(vars.mongo.uri)
 .then(() => console.log("Connect DB successs!"))
 .catch((err) => console.log(err) );

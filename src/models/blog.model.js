@@ -23,7 +23,8 @@ const blogSchema = new Schema(
       type: String,
     },
     tags: 
-      {type: String}
+    [{type: Schema.Types.ObjectId,
+      ref: 'Category'}]
     ,
     slug: {
       type: String,
