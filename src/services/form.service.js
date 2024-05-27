@@ -1,12 +1,12 @@
-import { Form } from "../models/formCustomer.model.js";
+import { FormCustomer } from "../models/formCustomer.model.js";
 import { blogStatusEnum } from "../enums/blogStatus.enum.js";
 
 let getListForm = (limit = 20, page = 0, search) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const totalForm = await Form.countDocuments();
+      const totalForm = await FormCustomer.countDocuments();
       if (search) {
-        const formsSearch = await Form.find({ $regex : search})
+        const formsSearch = await FormCustomer.find({ $regex : search})
           .limit(limit)
           .skip(page * limit)
           .sort({ createdAt: -1 });
@@ -19,7 +19,7 @@ let getListForm = (limit = 20, page = 0, search) => {
           totalPage: Math.ceil(totalForm / limit),
         });
       }
-      const forms = await Form.find()
+      const forms = await FormCustomer.find()
         .limit(limit)
         .skip(page * limit)
         .sort({ createdAt: -1 });
@@ -42,7 +42,7 @@ let getDetailForm = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
       const { id } = data.params;
-      const form = await Form.findOne({ _id: id });
+      const form = await FormCustomer.findOne({ _id: id });
       if (!form) {
         resolve({
           status: 404,
