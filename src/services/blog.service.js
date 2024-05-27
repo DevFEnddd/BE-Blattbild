@@ -1,5 +1,5 @@
 import { Blog } from "../models/blog.model.js";
-import {genneralAccessToken, refeshAccessToken} from "./jwt.service.js";
+import jwtTokenService from "./jwt.service.js";
 import { blogStatusEnum } from "../enums/blogStatus.enum.js"
  
 

@@ -1,6 +1,6 @@
 import { Account } from "../models/account.model.js";
 import bcrypt from "bcrypt";
-import {genneralAccessToken, refeshAccessToken} from "./jwt.service.js";
+import jwtService from "./jwt.service.js";
 import { accountTypeEnum } from "../enums/accountType.enum.js";
 
 
@@ -20,11 +20,11 @@ let loginUser = (username, password) => {
             if (!checkPassword) {
                 resolve("Incorrect password.");
             }
-             const access_token = await genneralAccessToken({
+             const access_token = await jwtService.genneralAccessToken({
                 id:user.id,
                 isAdmin: user.isAdmin
             })
-            const refesh_token = await refeshAccessToken({
+            const refesh_token = await jwtService.refeshToken({
                 id:user.id,
                 isAdmin: user.isAdmin
             })
@@ -35,6 +35,7 @@ let loginUser = (username, password) => {
         }
     })
 }
+
 
 
 
