@@ -20,13 +20,16 @@ const vars = {
 };
 
 const app = express();
+app.use(bodyParser.json())
 
+app.use(cors());
+
+/* Routers */
+routes(app)
 /* Mongo Connection */
 mongoose.connect(vars.mongo.uri)
 .then(() => console.log("Connect DB successs!"))
 .catch((err) => console.log(err) );
-
-
 
 app.listen(vars.port, () => {
   console.log(`Server started on port ${vars.port} `);
