@@ -10,14 +10,14 @@ const genneralAccessToken = async (payload) => {
     return accessToken
 }
 
-const refeshAccessToken = async (payload) => {
+const genneralRefeshToken = async (payload) => {
     const refeshAccessToken = jwt.sign({
         payload
     }, process.env.REFRESH_TOKEN, {expiresIn: '365d'})
     return refeshAccessToken
 }
 
-const refeshToken = async (payload) => {
+const refeshToken = async (token) => {
     return new Promise( (resolve, reject) => {
         try {
             jwt.verify(token, process.env.REFRESH_TOKEN, async (err, user) => {
@@ -27,15 +27,15 @@ const refeshToken = async (payload) => {
                         message: "The authemtication"
                     })
                 }
-                const {payload} = user
                 const access_token = await genneralAccessToken({
-                id: payload?.id,
-                isAdmin: payload?.isAdmin
-            })
-            resolve({
-                status: 200,
-                message: "refresh token success!"
-            })
+                id: user?.id,
+                isAdmin: user?.isAdmin
+                })
+                resolve({
+                    status: 200,
+                    message: "Refresh token success!",
+                    access_token
+                })
             })
             
         } catch (err) {
@@ -46,4 +46,4 @@ const refeshToken = async (payload) => {
     
 }
 
-export default {genneralAccessToken, refeshAccessToken, refeshToken}
+export default {genneralAccessToken, genneralRefeshToken, refeshToken}

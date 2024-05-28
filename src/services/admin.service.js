@@ -14,24 +14,36 @@ let loginUser = (username, password) => {
             let user = await Account.findOne({
                 username: username
             });
-                console.log(user, username)
-
+         
             if (!user) {
-                resolve("Incorrect username.");
+                reject({
+                    status: 400,
+                    message: "Incorrect username!",
+                })
             }
             let checkPassword = bcrypt.compareSync(password, user.password);
+
             if (!checkPassword) {
-                resolve("Incorrect password.");
+                reject({
+                    status: 400,
+                    message: "Incorrect username!",
+                })
             }
              const access_token = await jwtService.genneralAccessToken({
-                id:user.id,
-                isAdmin: user.isAdmin
+                id:user._id,
+                isAdmin: !!user.type
             })
-            const refesh_token = await jwtService.refeshToken({
-                id:user.id,
-                isAdmin: user.isAdmin
+            const refesh_token = await jwtService.genneralRefeshToken({
+                id:user._id,
+                isAdmin: !!user.type
             })
-            resolve({user, access_token, refesh_token})
+            resolve({
+                status: 200,
+                message: "Login Successfully!",
+                user,
+                access_token,
+                refesh_token
+            })
         } catch (err) {
             console.log(err);
             return reject(null, false);

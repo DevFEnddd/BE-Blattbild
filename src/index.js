@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose"
 import cors from "cors"
 import bodyParser from "body-parser"
+import cookieParser from "cookie-parser"
 import routes from './routes/index.js'
 
 // const routes = require("./routes/index.js")
@@ -21,6 +22,7 @@ const vars = {
 
 const app = express();
 app.use(bodyParser.json())
+app.use(cookieParser())
 
 app.use(cors());
 

@@ -48,9 +48,9 @@ if (vars.env === "development") {
 
 const migrateData = async () => {
   await Account.deleteMany({});
-  // await createdAdminAccount();
+  await createdAdminAccount();
   // await createCategory();
-  await createBlog();
+  // await createBlog();
 
 }
 

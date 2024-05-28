@@ -1,17 +1,18 @@
 import { Blog } from "../models/blog.model.js";
  
 
-let getListBlog = (limit = 20, page = 0) => {
+let getListBlog = (limit, page ) => {
 
     return new Promise(async (resolve, reject) => {
+        console.log(limit, page)
         try {
             const totalBlog = await Blog.countDocuments();
             const blogs = await Blog.find({}).limit(limit).skip(page * limit).sort({ createdAt: -1 });
             resolve({
                 status: 200,
                 message: "SUCCESS",
-                data: blogs,
-                total: totalBlog,
+                blogs,
+                totalBlog,
                 pageCurrent: Number(page + 1),
                 totalPage: Math.ceil(totalBlog/limit)
             })
@@ -37,7 +38,7 @@ let getDetailBlog = (data) => {
             resolve({
                 status: 200,
                 message: "SUCCESS",
-                data: blog,
+                blog,
             })
         } catch (err) {
             console.log(err);

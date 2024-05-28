@@ -3,18 +3,17 @@ import { FormCustomer } from "../models/formCustomer.model.js";
 let createForm = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { name, email, phone, form, note } = data.body;
-      const newForm = await Blog.create({
+      const { name, email, phone, form } = data.body;
+      const newBlog = await FormCustomer.create({
         name,
         email,
         phone,
-        form,
-        note,
+        form
       });
-      if (newForm) {
+      if (newBlog) {
         resolve({
-          status: "200",
-          messsage: "SUCCESS",
+          status: 200,
+          messsage: "Request sent successfully!",
           data: newBlog,
         });
       }

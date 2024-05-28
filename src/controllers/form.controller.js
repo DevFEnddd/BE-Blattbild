@@ -6,8 +6,7 @@ const createForm = async (req, res, next) => {
         const { name,
           email,
           phone,
-          form,
-          note } = req.body
+          form } = req.body
 
           if (!name) {
             return res.status(500).json({
