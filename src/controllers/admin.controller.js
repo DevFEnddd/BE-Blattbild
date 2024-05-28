@@ -27,7 +27,6 @@ const loginUser = async (req, res, next) => {
 }
 const logoutUser = async (req, res, next) => {
     try {
-        
         res.clearCookie("refresh_token")
         return res.status(200).json({
             status: 200,
