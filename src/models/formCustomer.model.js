@@ -17,11 +17,21 @@ const formCustomerSchema = new Schema(
     form: {
       type: String,
     },
-    note: {
-      type: String,
-    },
+    // note: {
+    //   type: String,
+    // },
   },
-  { timestamp: true }
+  {
+    timestamps: true,
+    versionKey: false,
+    toJSON: {
+      virtuals: true,
+      transform(doc, ret) {
+        delete ret.id;
+        delete ret.password;
+      },
+    },
+  }
 );
 
 formCustomerSchema.plugin(mongoosePaginate);

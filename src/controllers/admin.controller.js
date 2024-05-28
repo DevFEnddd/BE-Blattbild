@@ -2,21 +2,24 @@
 import AdminService from '../services/admin.service.js'
 import JwtService from '../services/jwt.service.js'
 
-import jwt from 'jsonwebtoken'
-
-
 const loginUser = async (req, res, next) => {
     const { username, password  } = req.body
     try {
         if (!username || !password) {
-            return res.status(500).json({
-                status: 'ERR',
+            return res.json({
+                status: 400,
                 message: 'the input is required'
             })
         }
         const response = await AdminService.loginUser(username, password)
-       
-        return res.status(200).json(response)
+        const { refresh_token, ...newResponse } = response
+        res.cookie('refresh_token', refresh_token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+            path: "/"
+        })
+        return res.status(200).json(newResponse)
     } catch(err) {
         console.error(err);
       return next(err);
@@ -37,7 +40,7 @@ const logoutUser = async (req, res, next) => {
 }
 const refreshToken = async (req, res, next) => {
     try {
-        const token = req.headers.token.split(' ')[1]
+        const token = req.cookies?.refresh_token
         if(!token){
             return res.status(404).json({
                 status: 404,

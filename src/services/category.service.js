@@ -1,4 +1,4 @@
-import { Category } from "../models/category.model";
+import { Category } from "../models/category.model.js";
  
 
 let getListCategory = () => {
@@ -10,7 +10,7 @@ let getListCategory = () => {
             resolve({
                 status: 200,
                 message: "SUCCESS",
-                data: categories,
+                categories,
                 total: totalCategory
             })
         } catch (err) {
