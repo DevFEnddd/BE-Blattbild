@@ -10,10 +10,10 @@ router.post('/login', loginUser)
 router.post('/logout', logoutUser)
 router.post('/refresh-token', refreshToken)
 // form admin
-router.get('/list',authMiddleware, listForm)
+router.get('/form-list',authMiddleware, listForm)
 router.get('/detail-form/:id',authMiddleware, detailForm)
 // blog admin
-router.get('/list',authMiddleware, listBlog)
+router.get('/blog-list',authMiddleware, listBlog)
 router.get('/detail-blog/:slug',authMiddleware, detailBlog)
 router.post('/new',authMiddleware, createBlog)
 router.put('/update-blog/:slug',authMiddleware, updateBlog)

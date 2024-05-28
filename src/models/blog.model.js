@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { nanoid } from 'nanoid';
 import slugify from 'slugify';
-// import mongoosePaginate from 'mongoose-paginate-v2';
+import mongoosePaginate from 'mongoose-paginate-v2';
 import { blogStatusEnum } from '../enums/blogStatus.enum.js';
 
 const { Schema } = mongoose;
@@ -52,7 +52,7 @@ const blogSchema = new Schema(
   }
 );
 
-// blogSchema.plugin(mongoosePaginate);
+blogSchema.plugin(mongoosePaginate);
 
 const Blog = mongoose.model('blog', blogSchema);
 export { Blog };
