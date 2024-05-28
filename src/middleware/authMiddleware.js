@@ -8,7 +8,6 @@ const authMiddleware = (req, res, next) => {
 
     jwt.verify(token, process.env.ACCESS_TOKEN, (err, user) => {
         if(err) {
-            console.log(err)
             return res.status(404).json({
                 message: 'You do not have permission!1',
                 status: 'ERROR'

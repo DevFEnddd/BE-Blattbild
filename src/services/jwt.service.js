@@ -27,7 +27,6 @@ const refeshToken = async (token) => {
                         message: "The authemtication"
                     })
                 }
-                console.log(user.payload)
 
                 const access_token = await genneralAccessToken({
                 id: user.payload?.id,
