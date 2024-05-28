@@ -14,26 +14,25 @@ let loginUser = (username, password) => {
             let user = await Account.findOne({
                 username: username
             });
-         
             if (!user) {
-                reject({
+                resolve({
                     status: 400,
                     message: "Incorrect username!",
                 })
             }
-            let checkPassword = bcrypt.compareSync(password, user.password);
+            let checkPassword = bcrypt.compareSync(password, user?.password);
 
             if (!checkPassword) {
-                reject({
+                resolve({
                     status: 400,
-                    message: "Incorrect username!",
+                    message: "Incorrect password!",
                 })
             }
              const access_token = await jwtService.genneralAccessToken({
                 id:user._id,
                 isAdmin: !!user.type
             })
-            const refesh_token = await jwtService.genneralRefeshToken({
+            const refresh_token = await jwtService.genneralRefeshToken({
                 id:user._id,
                 isAdmin: !!user.type
             })
@@ -42,7 +41,7 @@ let loginUser = (username, password) => {
                 message: "Login Successfully!",
                 user,
                 access_token,
-                refesh_token
+                refresh_token
             })
         } catch (err) {
             console.log(err);
@@ -64,7 +63,7 @@ let getListForm = (limit = 20, page = 0, search) => {
           status: 200,
           message: "SUCCESS",
           data: formsSearch,
-          total: totalForm,
+          totalForm,
           pageCurrent: Number(page + 1),
           totalPage: Math.ceil(totalForm / limit),
         });
@@ -77,7 +76,7 @@ let getListForm = (limit = 20, page = 0, search) => {
         status: 200,
         message: "SUCCESS",
         data: forms,
-        total: totalForm,
+        totalForm,
         pageCurrent: Number(page + 1),
         totalPage: Math.ceil(totalForm / limit),
       });
@@ -120,7 +119,7 @@ let getListBlog = (limit = 20, page = 0, sort , status) => {
                 const blogsFind = await Blog.find({
                     status: status,
                     title: { '$regex' : search}
-                }).limit(limit).skip(page * limit).sort({
+                }).populate("tags").limit(limit).skip(page * limit).sort({
                     createdAt: sort
                 })
                 resolve({
@@ -132,7 +131,7 @@ let getListBlog = (limit = 20, page = 0, sort , status) => {
                     totalPage: Math.ceil(totalBlog/limit)
                 })
             }
-            const blogs = await Blog.find().limit(limit).skip(page * limit).sort({ createdAt: -1 });
+            const blogs = await Blog.find().populate("tags").limit(limit).skip(page * limit).sort({ createdAt: -1 });
             resolve({
                 status: 200,
                 message: "SUCCESS",
@@ -153,7 +152,7 @@ let getDetailBlog = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
             const { slug } = data.params;
-            const blog = await Blog.findOne({ slug: slug});
+            const blog = await Blog.findOne({ slug: slug}).populate("tags");
             if(!blog) {
                 resolve({
                     status: 500,
@@ -254,7 +253,7 @@ let updateBlog = (data) => {
     })
 }
 
-let deleteBlog = () => {
+let deleteBlog = (req) => {
 
     return new Promise(async (resolve, reject) => {
         try {

@@ -3,11 +3,14 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 const authMiddleware = (req, res, next) => {
-    const token = req.headers.token.split(' ')[1]
+    const token = req?.header('authorization')?.split(' ')[1]
+  
+
     jwt.verify(token, process.env.ACCESS_TOKEN, (err, user) => {
         if(err) {
+            console.log(err)
             return res.status(404).json({
-                message: 'You do not have permission!',
+                message: 'You do not have permission!1',
                 status: 'ERROR'
             })
         }

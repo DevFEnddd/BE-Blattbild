@@ -57,7 +57,7 @@ const refreshToken = async (req, res, next) => {
 const listForm = async (req, res, next) => {
     try {
         const { limit , page, search } = req.query
-        const response = await AdminService.getListForm(Number(limit) , Number(page), search)
+        const response = await AdminService.getListForm(Number(limit) || 10 , Number(page) || 0, search)
         return res.status(200).json(response)
     } catch(err) {
         console.error(err);
@@ -78,7 +78,7 @@ const detailForm = async (req, res, next ) => {
 const listBlog = async (req, res, next) => {
     try {
         const { limit , page, sort } = req.query
-        const response = await AdminService.getListBlog(Number(limit) , Number(page), sort)
+        const response = await AdminService.getListBlog(Number(limit) || 20 , Number(page) || 0, sort)
         return res.status(200).json(response)
     } catch(err) {
         console.error(err);
