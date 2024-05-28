@@ -1,10 +1,10 @@
 import bcrypt from "bcrypt";
-import async from "async";
 import dotenv from "dotenv-safe";
 import path from "path";
 import { fileURLToPath } from "url";
 
 import { Category } from "../models/category.model.js";
+import { Blog } from "../models/blog.model.js";
 import { Account } from "../models/account.model.js";
 import libphonenum from "google-libphonenumber";
 
@@ -17,6 +17,9 @@ import mongoose from "mongoose";
 import fs from "fs";
 import { accountTypeEnum } from "../enums/accountType.enum.js";
 import { accountStatusEnum } from "../enums/accountStatus.enum.js";
+const importBlogs = JSON.parse(
+  fs.readFileSync(new URL("./blog.json", import.meta.url))
+);
 const importCategories = JSON.parse(
   fs.readFileSync(new URL("./category.json", import.meta.url))
 );
@@ -24,11 +27,10 @@ const importCategories = JSON.parse(
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({
-  path: path.join(__dirname, "../../.env"),
-  // example: path.join(__dirname, '../.env.example')
+  path: path.join(__dirname, "./.env"),
+  example: path.join(__dirname, './.env.example')
 });
 
-console.log(importCategories);
 const vars = {
   env: process.env.NODE_ENV,
   port: process.env.PORT || 3000,
@@ -45,10 +47,11 @@ if (vars.env === "development") {
 }
 
 const migrateData = async () => {
-    console.log("1232")
   await Account.deleteMany({});
-  await createdAdminAccount();
-  await createCategory();
+  // await createdAdminAccount();
+  // await createCategory();
+  await createBlog();
+
 }
 
 const createdAdminAccount = async (req, res, next)  => {
@@ -80,10 +83,17 @@ const createdAdminAccount = async (req, res, next)  => {
       }
     );
 }
+
+const createBlog = async (req, res, next) => {
+  await Blog.deleteMany({});
+  await Blog.insertMany(importBlogs);
+  console.log(`✨ Inserted Blog`);
+};
+
 const createCategory = async (req, res, next) => {
   await Category.deleteMany({});
   await Category.insertMany(importCategories);
-  console.log(`✨ Inserted`);
+  console.log(`✨ Inserted Category`);
 };
    
 mongoose
