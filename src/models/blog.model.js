@@ -17,7 +17,7 @@ const blogSchema = new Schema(
     },
     thumbnail: {
       type: String,
-      default: 'https://via.placeholder.com/300x300.jpg?text=tmptechnology.vn',
+      default: 'https://cdn-eipmp.nitrocdn.com/ZmvUXPcuuBpGedMIxvrrPiwxyewyyhAp/assets/images/optimized/rev-80232f8/passionates.com/wp-content/uploads/2024/04/Hire-Interim-CFO-for-Startups-1024x683.png',
     },
     content: {
       type: String,
