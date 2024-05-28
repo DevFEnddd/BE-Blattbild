@@ -24,6 +24,10 @@ const app = express();
 app.use(bodyParser.json())
 app.use(cookieParser())
 
+app.use(cors());
+
+/* Routers */
+routes(app)
 /* Mongo Connection */
 mongoose.connect(vars.mongo.uri)
 .then(() => console.log("Connect DB successs!"))
