@@ -1,4 +1,5 @@
 import { Blog } from "../models/blog.model.js";
+import { blogStatusEnum } from "../enums/blogStatus.enum.js"
  
 
 let getListBlog = (limit, page ) => {
@@ -6,7 +7,7 @@ let getListBlog = (limit, page ) => {
     return new Promise(async (resolve, reject) => {
         try {
             const totalBlog = await Blog.countDocuments();
-            const blogs = await Blog.find({}).populate("tags").limit(limit).skip(page * limit).sort({ createdAt: -1 });
+            const blogs = await Blog.find({status: blogStatusEnum.PUBLISHED}).populate("tags").limit(limit).skip(page * limit).sort({ createdAt: -1 });
             resolve({
                 status: 200,
                 message: "SUCCESS",
