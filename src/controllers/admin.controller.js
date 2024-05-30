@@ -97,7 +97,7 @@ const detailBlog = async (req, res, next ) => {
 }
 
 const createBlog = async (req, res, next ) => {
-    const {title, description, thumbnail, content, tags, slug, status} = req.body
+    const {title, description, thumbnail, content, tags, slug, status, headingContent} = req.body
     try {
         if (!title) {
             return res.status(500).json({

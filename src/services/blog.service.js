@@ -10,9 +10,9 @@ let getListBlog = (limit, page ) => {
             resolve({
                 status: 200,
                 message: "SUCCESS",
-                blogs,
+                data: blogs,
                 totalBlog,
-                pageCurrent: Number(page + 1),
+                pageCurrent: Number(page),
                 totalPage: Math.ceil(totalBlog/limit)
             })
         } catch (err) {
@@ -34,10 +34,15 @@ let getDetailBlog = (data) => {
                     message: "The blog is not found"
                 });
             }
+            const relatedBlogs = await Blog.aggregate([
+                {$sample: { size: 4 }}
+            ])
+
             resolve({
                 status: 200,
                 message: "SUCCESS",
                 blog,
+                relatedBlogs
             })
         } catch (err) {
             console.log(err);
