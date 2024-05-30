@@ -185,6 +185,7 @@ let createBlog = (data) => {
                 thumbnail: thumbnail || location,
                 tags,
                 status,
+                headingContent
             });
             if (newBlog) {
                 resolve({
