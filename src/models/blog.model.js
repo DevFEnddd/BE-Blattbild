@@ -19,6 +19,14 @@ const blogSchema = new Schema(
       type: String,
       default: 'https://cdn-eipmp.nitrocdn.com/ZmvUXPcuuBpGedMIxvrrPiwxyewyyhAp/assets/images/optimized/rev-80232f8/passionates.com/wp-content/uploads/2024/04/Hire-Interim-CFO-for-Startups-1024x683.png',
     },
+    headingContent: [{
+      id: {type : Number},
+      titleHeading: {type : String },
+      children: [{
+        id: {type : Number},
+        titleHeadingChildren: {type : String },
+      }]
+    }],
     content: {
       type: String,
     },

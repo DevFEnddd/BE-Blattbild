@@ -13,7 +13,7 @@ let loginUser = (username, password) => {
         try {
             let user = await Account.findOne({
                 username: username
-            });
+            }); 
             if (!user) {
                 resolve({
                     status: 400,
@@ -175,7 +175,7 @@ let createBlog = (data) => {
 
     return new Promise(async (resolve, reject) => {
         try {
-            const {title, description, thumbnail, content, tags, status} = data.body
+            const {title, description, thumbnail, content, tags, status, headingContent} = data.body
             const file = data.file;
             let location = file?.location;
             const newBlog = await Blog.create({
@@ -185,6 +185,7 @@ let createBlog = (data) => {
                 thumbnail: thumbnail || location,
                 tags,
                 status,
+                headingContent
             });
             if (newBlog) {
                 resolve({
@@ -205,7 +206,7 @@ let updateBlog = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
             const { slug } = data.params;
-            const {title, description, thumbnail, content, tags, status} = data.body;
+            const {title, description, thumbnail, content, tags, status, headingContent} = data.body;
             const blog = await Blog.findOne({ slug: slug });
             if (!blog) {
                 resolve({

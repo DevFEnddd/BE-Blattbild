@@ -97,7 +97,7 @@ const detailBlog = async (req, res, next ) => {
 }
 
 const createBlog = async (req, res, next ) => {
-    const {title, description, thumbnail, content, tags, slug, status} = req.body
+    const {title, description, thumbnail, content, tags, slug, status, headingContent } = req.body
     try {
         if (!title) {
             return res.status(500).json({
@@ -105,6 +105,7 @@ const createBlog = async (req, res, next ) => {
                 message: 'Missing required parameter!'
             })
         }
+        
         const response = await AdminService.createBlog(req)
         return res.status(200).json(response)
     } catch(err) {
