@@ -1,11 +1,13 @@
-import { Account } from "../models/account.model.js";
+import {Account} from "../models/account.model.js";
 import bcrypt from "bcrypt";
 import jwtService from "./jwt.service.js";
-import { FormCustomer } from "../models/formCustomer.model.js";
-import { Blog } from "../models/blog.model.js";
-import { blogStatusEnum } from "../enums/blogStatus.enum.js"
+import {FormCustomer} from "../models/formCustomer.model.js";
+import {Blog} from "../models/blog.model.js";
+import {blogStatusEnum} from "../enums/blogStatus.enum.js"
 // import { accountTypeEnum } from "../enums/accountType.enum.js";
-
+import mongoose from 'mongoose';
+import {Category} from "../models/category.model.js";
+import {categoryTypeEnum} from "../enums/categoryType.enum.js";
 
 let loginUser = (username, password) => {
 
@@ -28,12 +30,12 @@ let loginUser = (username, password) => {
                     message: "Incorrect password!",
                 })
             }
-             const access_token = await jwtService.genneralAccessToken({
-                id:user._id,
+            const access_token = await jwtService.genneralAccessToken({
+                id: user._id,
                 isAdmin: !!user.type
             })
             const refresh_token = await jwtService.genneralRefeshToken({
-                id:user._id,
+                id: user._id,
                 isAdmin: !!user.type
             })
             resolve({
@@ -49,172 +51,208 @@ let loginUser = (username, password) => {
         }
     })
 }
-
-let getListForm = (limit = 20, page = 0, search) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const totalForm = await FormCustomer.countDocuments();
-      if (search) {
-        const formsSearch = await FormCustomer.find({ $regex : search})
-          .limit(limit)
-          .skip(page * limit)
-          .sort({ createdAt: -1 });
-        resolve({
-          status: 200,
-          message: "SUCCESS",
-          data: formsSearch,
-          totalForm,
-          pageCurrent: Number(page + 1),
-          totalPage: Math.ceil(totalForm / limit),
-        });
-      }
-      const forms = await FormCustomer.find()
-        .limit(limit)
-        .skip(page * limit)
-        .sort({ createdAt: -1 });
-      resolve({
-        status: 200,
-        message: "SUCCESS",
-        data: forms,
-        totalForm,
-        pageCurrent: Number(page + 1),
-        totalPage: Math.ceil(totalForm / limit),
-      });
-    } catch (err) {
-      console.log(err);
-      return reject(null, false);
-    }
-  });
-};
-
-let getDetailForm = (data) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const { id } = data.params;
-      const form = await FormCustomer.findOne({ _id: id });
-      if (!form) {
-        resolve({
-          status: 404,
-          message: "Form not found!",
-        });
-      }
-      resolve({
-        status: 200,
-        message: "SUCCESS",
-        data: form,
-      });
-    } catch (err) {
-      console.log(err);
-      return reject(null, false);
-    }
-  });
-};
-
-let getListBlog = (limit = 20, page = 0, sort , status) => {
-
+const getUserByUsername = (username) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const totalBlog = await Blog.countDocuments();
-            if (sort || status) {
-                const blogsFind = await Blog.find({
-                    status: status,
-                    title: { '$regex' : search}
-                }).populate("tags").limit(limit).skip(page * limit).sort({
-                    createdAt: sort
-                })
+            let user = await Account.findOne({
+                username: username
+            });
+            if (!user) {
+                resolve({
+                    status: 404,
+                    message: "User not found!",
+                });
+            }
+            resolve({
+                status: 200,
+                message: "User found successfully!",
+                user,
+            });
+        } catch (err) {
+            console.log(err);
+            return reject(null, false);
+        }
+    });
+};
+let getListForm = (limit = 20, page = 0, search) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const totalForm = await FormCustomer.countDocuments();
+            if (search) {
+                const formsSearch = await FormCustomer.find({$regex: search})
+                    .limit(limit)
+                    .skip(page * limit)
+                    .sort({createdAt: -1});
                 resolve({
                     status: 200,
                     message: "SUCCESS",
-                    data: blogsFind,
-                    total: totalBlog,
+                    data: formsSearch,
+                    totalForm,
                     pageCurrent: Number(page + 1),
-                    totalPage: Math.ceil(totalBlog/limit)
-                })
+                    totalPage: Math.ceil(totalForm / limit),
+                });
             }
-            const blogs = await Blog.find().populate("tags").limit(limit).skip(page * limit).sort({ createdAt: -1 });
+            const forms = await FormCustomer.find()
+                .limit(limit)
+                .skip(page * limit)
+                .sort({createdAt: -1});
+            resolve({
+                status: 200,
+                message: "SUCCESS",
+                data: forms,
+                totalForm,
+                pageCurrent: Number(page + 1),
+                totalPage: Math.ceil(totalForm / limit),
+            });
+        } catch (err) {
+            console.log(err);
+            return reject(null, false);
+        }
+    });
+};
+
+let getDetailForm = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const {id} = data.params;
+            const form = await FormCustomer.findOne({_id: id});
+            if (!form) {
+                resolve({
+                    status: 404,
+                    message: "Form not found!",
+                });
+            }
+            resolve({
+                status: 200,
+                message: "SUCCESS",
+                data: form,
+            });
+        } catch (err) {
+            console.log(err);
+            return reject(null, false);
+        }
+    });
+};
+
+let getListBlog = (limit = 20, page = 0, sort, status, search ) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const filter = {
+                status: { $ne: blogStatusEnum.DELETED },
+                ...(search && { title: { $regex: search, $options: 'i' } })
+            };
+
+            const totalBlog = await Blog.countDocuments(filter);
+
+            const query = Blog.find(filter).populate("tags").limit(limit).skip(page * limit);
+
+            if (sort) {
+                query.sort({ createdAt: sort });
+            } else {
+                query.sort({ createdAt: -1 });
+            }
+
+            const blogs = await query;
+
             resolve({
                 status: 200,
                 message: "SUCCESS",
                 data: blogs,
                 total: totalBlog,
                 pageCurrent: Number(page + 1),
-                totalPage: Math.ceil(totalBlog/limit)
-            })
+                totalPage: Math.ceil(totalBlog / limit)
+            });
         } catch (err) {
             console.log(err);
             return reject(null, false);
         }
-    })
-} 
+    });
+};
 
-let getDetailBlog = (data) => {
-
+let getDetailBlog = async (id) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const { slug } = data.params;
-            const blog = await Blog.findOne({ slug: slug}).populate("tags");
-            if(!blog) {
+            const blog = await Blog.findById(id).populate("tags");
+            if (!blog) {
                 resolve({
-                    status: 500,
-                    message: "The blog is not defined"
+                    status: 404,
+                    message: "Blog not found",
                 });
             }
             resolve({
                 status: 200,
                 message: "SUCCESS",
                 data: blog,
-            })
+            });
         } catch (err) {
             console.log(err);
             return reject(null, false);
         }
-    })
-} 
+    });
+};
+
 
 let createBlog = (data) => {
-
     return new Promise(async (resolve, reject) => {
         try {
-            const {title, description, thumbnail, content, tags, status, headingContent} = data.body
+            const {title, description, thumbnail, content, tags, status, headingContent} = data.body;
             const file = data.file;
             let location = file?.location;
+
+            const tagIds = await Promise.all(tags.map(async (tag) => {
+                let category = await Category.findOne({title: tag, type: categoryTypeEnum.WEBSITES});
+                if (!category) {
+                    category = await Category.create({title: tag, type: categoryTypeEnum.WEBSITES});
+                }
+                return category._id;
+            }));
+
             const newBlog = await Blog.create({
                 title,
                 description,
                 content: content || "",
                 thumbnail: thumbnail || location,
-                tags,
+                tags: tagIds,
                 status,
                 headingContent
             });
+
             if (newBlog) {
                 resolve({
                     status: "200",
-                    messsage: "SUCCESS",
+                    message: "SUCCESS",
                     data: newBlog
-                })
+                });
             }
         } catch (err) {
             console.log(err);
             return reject(null, false);
         }
-    })
-}
+    });
+};
 
 let updateBlog = (data) => {
 
     return new Promise(async (resolve, reject) => {
         try {
-            const { slug } = data.params;
-            const {title, description, thumbnail, content, tags, status, headingContent} = data.body;
-            const blog = await Blog.findOne({ slug: slug });
+            const {slug} = data.params;
+            const {title, description, thumbnail, content, tags, status, headingContent, id} = data.body;
+            let blog;
+            if (!id) {
+                resolve({
+                    status: "500",
+                    message: "Blog không tồn tại!"
+                })
+            } else {
+                blog = await Blog.findById(id);
+            }
             if (!blog) {
                 resolve({
                     status: "500",
                     message: "Blog không tồn tại!"
                 })
             }
-            
+
             let isChange = false;
             if (title && blog.title !== title) {
                 blog.title = title;
@@ -246,7 +284,7 @@ let updateBlog = (data) => {
                 message: "Update Blog Success!",
                 data: blog
             })
-          
+
         } catch (err) {
             console.log(err);
             return reject(null, false);
@@ -258,24 +296,35 @@ let deleteBlog = (req) => {
 
     return new Promise(async (resolve, reject) => {
         try {
-            const { id } = req.params;
+            const {id} = req.params;
             const checkDelete = await Blog.findOne({
                 _id: id,
-                status: { $ne: blogStatusEnum.DELETED },
-              });
+                status: {$ne: blogStatusEnum.DELETED},
+            });
+            console.log(checkDelete, id)
             if (!checkDelete) resolve("Blog not found");
-            await Blog.findByIdAndUpdate(id, { $set: { status: blogStatusEnum.DELETED } }, { new: true });
+            await Blog.findByIdAndUpdate(id, {$set: {status: blogStatusEnum.DELETED}}, {new: true});
             resolve({
                 status: 200,
                 message: "Delete Blog Success!"
             })
-          
+
         } catch (err) {
             console.log(err);
             return reject(null, false);
         }
     })
-} 
+}
 
 
-export default { loginUser, getListForm, getDetailForm, getListBlog, createBlog, updateBlog, getDetailBlog, deleteBlog };
+export default {
+    getUserByUsername,
+    loginUser,
+    getListForm,
+    getDetailForm,
+    getListBlog,
+    createBlog,
+    updateBlog,
+    getDetailBlog,
+    deleteBlog
+};
