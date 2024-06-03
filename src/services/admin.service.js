@@ -163,9 +163,6 @@ let getListBlog = (limit = 10, page = 0, sort, status, search) => {
                     case 'latest':
                         query.sort({createdAt: -1}); // Latest first
                         break;
-                    case 'popular':
-                        query.sort({views: -1}); // Most popular (assuming 'views' field tracks popularity)
-                        break;
                     default:
                         query.sort({createdAt: -1}); // Default to latest
                         break;
