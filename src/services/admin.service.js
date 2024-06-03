@@ -28,6 +28,7 @@ let loginUser = (username, password) => {
                     message: "Incorrect username!",
                 })
             }
+            console.log(user)
             let checkPassword = bcrypt.compareSync(password, user?.password);
 
             if (!checkPassword) {
@@ -148,12 +149,12 @@ let getListBlog = (limit = 10, page = 0, sort, status, search) => {
             const filter = {
                 status: {$ne: blogStatusEnum.DELETED},
                 ...(search && {title: {$regex: search, $options: 'i'}}),
-                ...(status !== undefined && statusMapping[status] !== undefined && {status: statusMapping[status]}) // Thêm
+                ...(status !== undefined && statusMapping[status] !== undefined && {status: statusMapping[status]})
             };
 
             const totalBlog = await Blog.countDocuments(filter);
 
-            const query = Blog.find(filter).populate("tags").limit(limit).skip(page * limit);
+            const query = Blog.find(filter).populate("tags").limit(limit).skip((page - 1) * limit);
 
             if (sort) {
                 switch (sort) {
@@ -173,7 +174,6 @@ let getListBlog = (limit = 10, page = 0, sort, status, search) => {
 
             const blogs = await query;
 
-
             resolve({
                 status: 200,
                 message: "SUCCESS",
@@ -184,10 +184,34 @@ let getListBlog = (limit = 10, page = 0, sort, status, search) => {
             });
         } catch (err) {
             console.log(err);
+            return reject({
+                status: 500,
+                message: "ERROR",
+                error: err
+            });
+        }
+    });
+};
+
+let getTotalBlog = () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const totalDraft = await Blog.countDocuments({status: statusMapping.draft});
+            const totalPublished = await Blog.countDocuments({status: statusMapping.published});
+
+            resolve({
+                status: 200,
+                message: "SUCCESS",
+                totalDraft: totalDraft,
+                totalPublished: totalPublished
+            });
+        } catch (err) {
+            console.log(err);
             return reject(null, false);
         }
     });
 };
+
 let getDetailBlog = async (id) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -214,9 +238,12 @@ let createBlog = (data) => {
         try {
             const {title, description, thumbnail, content, tags, status, headingContent} = data.body;
             const file = data.file;
-            let location = file?.location;
+            const serverUrl = process.env.SERVER_URL;
+            const filePath = file?.path.replace(/\\/g, '/');
+            const fileUrl = filePath ? `${serverUrl}/${filePath}` : null;
+            const tagsArr = tags.split(",");
 
-            const tagIds = await Promise.all(tags.map(async (tag) => {
+            const tagIds = await Promise.all(tagsArr.map(async (tag) => {
                 let category = await Category.findOne({title: tag, type: categoryTypeEnum.WEBSITES});
                 if (!category) {
                     category = await Category.create({title: tag, type: categoryTypeEnum.WEBSITES});
@@ -228,7 +255,7 @@ let createBlog = (data) => {
                 title,
                 description,
                 content: content || "",
-                thumbnail: thumbnail || location,
+                thumbnail: fileUrl,
                 tags: tagIds,
                 status,
                 headingContent
@@ -247,29 +274,34 @@ let createBlog = (data) => {
         }
     });
 };
-let updateBlog = (data) => {
 
+let updateBlog = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
             const {slug} = data.params;
-            const {title, description, thumbnail, content, tags, status, headingContent, id} = data.body;
-            let blog;
+            const {title, description, content, tags, status, headingContent, id} = data.body;
+            const file = data.file;
+            const serverUrl = process.env.SERVER_URL;
+            const filePath = file?.path.replace(/\\/g, '/');
+            const fileUrl = filePath ? `${serverUrl}/${filePath}` : null;
+
             if (!id) {
-                resolve({
+                return resolve({
                     status: "500",
                     message: "Blog không tồn tại!"
-                })
-            } else {
-                blog = await Blog.findById(id);
+                });
             }
+
+            let blog = await Blog.findById(id);
             if (!blog) {
-                resolve({
+                return resolve({
                     status: "500",
                     message: "Blog không tồn tại!"
-                })
+                });
             }
 
             let isChange = false;
+
             if (title && blog.title !== title) {
                 blog.title = title;
                 isChange = true;
@@ -278,35 +310,107 @@ let updateBlog = (data) => {
                 blog.description = description;
                 isChange = true;
             }
-            if (thumbnail && blog.thumbnail !== thumbnail) {
-                blog.thumbnail = thumbnail;
+            if (fileUrl && blog.thumbnail !== fileUrl) {
+                blog.thumbnail = fileUrl;
                 isChange = true;
             }
             if (content && blog.content !== content) {
                 blog.content = content;
                 isChange = true;
             }
-            if (tags && blog.tags !== tags) {
-                blog.tags = tags;
-                isChange = true;
+
+            if (tags) {
+                const tagsArr = tags.split(",");
+                const tagIds = await Promise.all(tagsArr.map(async (tag) => {
+                    let category = await Category.findOne({title: tag, type: categoryTypeEnum.WEBSITES});
+                    if (!category) {
+                        category = await Category.create({title: tag, type: categoryTypeEnum.WEBSITES});
+                    }
+                    return category._id;
+                }));
+
+                if (blog.tags.toString() !== tagIds.toString()) {
+                    blog.tags = tagIds;
+                    isChange = true;
+                }
             }
+
             if (status && blog.status !== status) {
                 blog.status = status;
                 isChange = true;
             }
-            if (isChange) await blog.save();
+            if (headingContent && blog.headingContent !== headingContent) {
+                blog.headingContent = headingContent;
+                isChange = true;
+            }
+
+            if (isChange) {
+                await blog.save();
+            }
+
             resolve({
                 status: 200,
                 message: "Update Blog Success!",
                 data: blog
-            })
+            });
 
         } catch (err) {
             console.log(err);
             return reject(null, false);
         }
-    })
-}
+    });
+};
+
+const updateStatusBlog = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const { id, status } = data.body;
+
+            if (!id) {
+                return resolve({
+                    status: "500",
+                    message: "Blog không tồn tại!"
+                });
+            }
+
+            if (!status || (status !== 'draft' && status !== 'published')) {
+                return resolve({
+                    status: "400",
+                    message: "Trạng thái không hợp lệ! Chỉ chấp nhận 'draft' hoặc 'published'."
+                });
+            }
+
+            let blog = await Blog.findById(id);
+            if (!blog) {
+                return resolve({
+                    status: "500",
+                    message: "Blog không tồn tại!"
+                });
+            }
+
+            if (blog.status !== statusMapping[status]) {
+                blog.status = statusMapping[status];
+                await blog.save();
+                return resolve({
+                    status: 200,
+                    message: "Cập nhật trạng thái thành công!",
+                    data: blog
+                });
+            } else {
+                return resolve({
+                    status: 200,
+                    message: "Trạng thái không thay đổi!",
+                    data: blog
+                });
+            }
+
+        } catch (err) {
+            console.log(err);
+            return reject(null, false);
+        }
+    });
+};
+
 let deleteBlog = (req) => {
 
     return new Promise(async (resolve, reject) => {
@@ -341,5 +445,7 @@ export default {
     createBlog,
     updateBlog,
     getDetailBlog,
-    deleteBlog
+    deleteBlog,
+    getTotalBlog,
+    updateStatusBlog
 };

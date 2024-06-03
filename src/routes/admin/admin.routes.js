@@ -14,9 +14,11 @@ import {
     updateBlog,
     deleteBlog,
     detailBlog,
-    getUser
+    getUser,
+    getTotalBlog, updateStatusBlog
 } from "../../controllers/admin.controller.js"
 import {authMiddleware} from "../../middleware/authMiddleware.js"
+import upload from "../../middleware/uploadMiddleware.js";
 
 
 router.post('/login', loginUser)
@@ -30,9 +32,10 @@ router.get('/detail-form/:id', authMiddleware, detailForm)
 // blog admin
 router.get('/blog-list', authMiddleware, listBlog)
 router.get('/detail-blog', authMiddleware, detailBlog)
-router.post('/new', authMiddleware, createBlog)
-router.put('/update-blog', authMiddleware, updateBlog)
+router.get('/total-blog', authMiddleware, getTotalBlog)
+router.post('/new', authMiddleware, upload.single('coverUrl'), createBlog)
+router.put('/update-blog', authMiddleware, upload.single('coverUrl'), updateBlog)
+router.put('/update-blog-status', authMiddleware, updateStatusBlog)
 router.delete('/delete-blog/:id', authMiddleware, deleteBlog)
-
 
 export default router

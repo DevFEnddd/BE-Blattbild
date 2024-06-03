@@ -39,7 +39,7 @@ const refreshToken = async (req, res, next) => {
                 message: "Token expired!",
             })
         }
-        const response = await JwtService.refeshToken(token)
+        const response = await JwtService.refeshToken(refresh_token)
         return res.status(200).json(response)
     } catch (err) {
         console.error(err);
@@ -96,15 +96,23 @@ const detailForm = async (req, res, next) => {
 
 const listBlog = async (req, res, next) => {
     try {
-        const {limit, page, sort, status} = req.query
-        const response = await AdminService.getListBlog(Number(limit) || 10, Number(page) || 0, sort, status)
+        const {limit, page, sort, status, search} = req.query
+        const response = await AdminService.getListBlog(10, Number(page) || 0, sort, status, search)
         return res.status(200).json(response)
     } catch (err) {
         console.error(err);
         return next(err);
     }
 }
-
+const getTotalBlog = async (req, res, next) => {
+    try {
+        const response = await AdminService.getTotalBlog();
+        return res.status(200).json(response)
+    } catch (err) {
+        console.error(err);
+        return next(err);
+    }
+}
 const detailBlog = async (req, res, next) => {
     try {
         const {id} = req.query;
@@ -151,6 +159,16 @@ const updateBlog = async (req, res, next) => {
     }
 }
 
+const updateStatusBlog = async (req, res, next) => {
+
+    try {
+        const response = await AdminService.updateStatusBlog(req)
+        return res.status(200).json(response)
+    } catch (err) {
+        console.error(err);
+        return next(err);
+    }
+}
 const deleteBlog = async (req, res, next) => {
 
     try {
@@ -180,5 +198,7 @@ export {
     updateBlog,
     deleteBlog,
     detailBlog,
-    getUser
+    getUser,
+    getTotalBlog,
+    updateStatusBlog
 };
