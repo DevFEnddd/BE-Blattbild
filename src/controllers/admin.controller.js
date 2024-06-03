@@ -97,7 +97,7 @@ const detailForm = async (req, res, next) => {
 const listBlog = async (req, res, next) => {
     try {
         const {limit, page, sort, status} = req.query
-        const response = await AdminService.getListBlog(Number(limit) || 20, Number(page) || 0, sort, status)
+        const response = await AdminService.getListBlog(Number(limit) || 10, Number(page) || 0, sort, status)
         return res.status(200).json(response)
     } catch (err) {
         console.error(err);

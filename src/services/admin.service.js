@@ -9,6 +9,12 @@ import mongoose from 'mongoose';
 import {Category} from "../models/category.model.js";
 import {categoryTypeEnum} from "../enums/categoryType.enum.js";
 
+const statusMapping = {
+    published: blogStatusEnum.PUBLISHED,
+    draft: blogStatusEnum.DRAFT,
+    deleted: blogStatusEnum.DELETED
+};
+
 let loginUser = (username, password) => {
 
     return new Promise(async (resolve, reject) => {
@@ -74,7 +80,9 @@ const getUserByUsername = (username) => {
         }
     });
 };
-let getListForm = (limit = 20, page = 0, search) => {
+
+// form
+let getListForm = (limit = 10, page = 0, search) => {
     return new Promise(async (resolve, reject) => {
         try {
             const totalForm = await FormCustomer.countDocuments();
@@ -110,7 +118,6 @@ let getListForm = (limit = 20, page = 0, search) => {
         }
     });
 };
-
 let getDetailForm = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -133,13 +140,9 @@ let getDetailForm = (data) => {
         }
     });
 };
-const statusMapping = {
-    published: blogStatusEnum.PUBLISHED,
-    draft: blogStatusEnum.DRAFT,
-    deleted: blogStatusEnum.DELETED
-};
 
-let getListBlog = (limit = 20, page = 0, sort, status, search) => {
+// blog
+let getListBlog = (limit = 10, page = 0, sort, status, search) => {
     return new Promise(async (resolve, reject) => {
         try {
             const filter = {
@@ -172,6 +175,7 @@ let getListBlog = (limit = 20, page = 0, sort, status, search) => {
             }
 
             const blogs = await query;
+
 
             resolve({
                 status: 200,
@@ -208,8 +212,6 @@ let getDetailBlog = async (id) => {
         }
     });
 };
-
-
 let createBlog = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -248,7 +250,6 @@ let createBlog = (data) => {
         }
     });
 };
-
 let updateBlog = (data) => {
 
     return new Promise(async (resolve, reject) => {
@@ -309,7 +310,6 @@ let updateBlog = (data) => {
         }
     })
 }
-
 let deleteBlog = (req) => {
 
     return new Promise(async (resolve, reject) => {
