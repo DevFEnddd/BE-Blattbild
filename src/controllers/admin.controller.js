@@ -11,7 +11,7 @@ const loginUser = async (req, res, next) => {
             })
         }
         const response = await AdminService.loginUser(username, password)
-        return res.status(200).json(response)
+        return res.status(response?.status ?? 400).json(response)
     } catch (err) {
         console.error(err);
         return next(err);
@@ -96,8 +96,8 @@ const detailForm = async (req, res, next) => {
 
 const listBlog = async (req, res, next) => {
     try {
-        const {limit, page, sort} = req.query
-        const response = await AdminService.getListBlog(Number(limit) || 20, Number(page) || 0, sort)
+        const {limit, page, sort, status} = req.query
+        const response = await AdminService.getListBlog(Number(limit) || 20, Number(page) || 0, sort, status)
         return res.status(200).json(response)
     } catch (err) {
         console.error(err);
@@ -107,10 +107,10 @@ const listBlog = async (req, res, next) => {
 
 const detailBlog = async (req, res, next) => {
     try {
-        const { id } = req.query;
+        const {id} = req.query;
 
         if (!id) {
-            return res.status(400).json({ message: "ID is required" });
+            return res.status(400).json({message: "ID is required"});
         }
 
         const response = await AdminService.getDetailBlog(id);

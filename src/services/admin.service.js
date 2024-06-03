@@ -133,13 +133,19 @@ let getDetailForm = (data) => {
         }
     });
 };
+const statusMapping = {
+    published: blogStatusEnum.PUBLISHED,
+    draft: blogStatusEnum.DRAFT,
+    deleted: blogStatusEnum.DELETED
+};
 
-let getListBlog = (limit = 20, page = 0, sort, status, search ) => {
+let getListBlog = (limit = 20, page = 0, sort, status, search) => {
     return new Promise(async (resolve, reject) => {
         try {
             const filter = {
-                status: { $ne: blogStatusEnum.DELETED },
-                ...(search && { title: { $regex: search, $options: 'i' } })
+                status: {$ne: blogStatusEnum.DELETED},
+                ...(search && {title: {$regex: search, $options: 'i'}}),
+                ...(status !== undefined && statusMapping[status] !== undefined && {status: statusMapping[status]}) // Thêm
             };
 
             const totalBlog = await Blog.countDocuments(filter);
@@ -147,9 +153,22 @@ let getListBlog = (limit = 20, page = 0, sort, status, search ) => {
             const query = Blog.find(filter).populate("tags").limit(limit).skip(page * limit);
 
             if (sort) {
-                query.sort({ createdAt: sort });
+                switch (sort) {
+                    case 'oldest':
+                        query.sort({createdAt: 1}); // Oldest first
+                        break;
+                    case 'latest':
+                        query.sort({createdAt: -1}); // Latest first
+                        break;
+                    case 'popular':
+                        query.sort({views: -1}); // Most popular (assuming 'views' field tracks popularity)
+                        break;
+                    default:
+                        query.sort({createdAt: -1}); // Default to latest
+                        break;
+                }
             } else {
-                query.sort({ createdAt: -1 });
+                query.sort({createdAt: -1}); // Default to latest
             }
 
             const blogs = await query;
@@ -168,7 +187,6 @@ let getListBlog = (limit = 20, page = 0, sort, status, search ) => {
         }
     });
 };
-
 let getDetailBlog = async (id) => {
     return new Promise(async (resolve, reject) => {
         try {
