@@ -83,42 +83,31 @@ const getUserByUsername = (username) => {
 };
 
 // form
-let getListForm = (limit = 10, page = 0, search) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const totalForm = await FormCustomer.countDocuments();
-            if (search) {
-                const formsSearch = await FormCustomer.find({$regex: search})
-                    .limit(limit)
-                    .skip(page * limit)
-                    .sort({createdAt: -1});
-                resolve({
-                    status: 200,
-                    message: "SUCCESS",
-                    data: formsSearch,
-                    totalForm,
-                    pageCurrent: Number(page + 1),
-                    totalPage: Math.ceil(totalForm / limit),
-                });
-            }
-            const forms = await FormCustomer.find()
-                .limit(limit)
-                .skip(page * limit)
-                .sort({createdAt: -1});
-            resolve({
-                status: 200,
-                message: "SUCCESS",
-                data: forms,
-                totalForm,
-                pageCurrent: Number(page + 1),
-                totalPage: Math.ceil(totalForm / limit),
-            });
-        } catch (err) {
-            console.log(err);
-            return reject(null, false);
-        }
-    });
+const getListForm = async (limit = 10, page = 0, sortBy = 'latest', search) => {
+    try {
+        const sortOrder = sortBy === 'oldest' ? 1 : -1; // 1 for ascending (oldest), -1 for descending (latest)
+        const query = search ? { name: { $regex: search, $options: 'i' } } : {};
+
+        const totalForm = await FormCustomer.countDocuments(query);
+        const forms = await FormCustomer.find(query)
+            .limit(limit)
+            .skip(page * limit)
+            .sort({ createdAt: sortOrder });
+
+        return {
+            status: 200,
+            message: "SUCCESS",
+            data: forms,
+            totalForm,
+            pageCurrent: Number(page + 1),
+            totalPage: Math.ceil(totalForm / limit),
+        };
+    } catch (err) {
+        console.log(err);
+        throw new Error('Error fetching form data');
+    }
 };
+
 let getDetailForm = (data) => {
     return new Promise(async (resolve, reject) => {
         try {

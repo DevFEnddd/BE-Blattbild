@@ -75,8 +75,8 @@ const getUser = async (req, res, next) => {
 };
 const listForm = async (req, res, next) => {
     try {
-        const {limit, page, search} = req.query
-        const response = await AdminService.getListForm(Number(limit) || 10, Number(page) || 0, search)
+        const {limit, page, search, sortBy} = req.query
+        const response = await AdminService.getListForm(Number(limit) || 10, Number(page)-1 || 0, sortBy, search)
         return res.status(200).json(response)
     } catch (err) {
         console.error(err);
