@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 import { Category } from "../models/category.model.js";
 import { Blog } from "../models/blog.model.js";
 import { Account } from "../models/account.model.js";
+import { FormCustomer } from "../models/formCustomer.model.js" 
 import libphonenum from "google-libphonenumber";
 
 const { PhoneNumberFormat, PhoneNumberUtil } = libphonenum;
@@ -94,6 +95,12 @@ const createCategory = async (req, res, next) => {
   await Category.deleteMany({});
   await Category.insertMany(importCategories);
   console.log(`✨ Inserted Category`);
+};
+
+const createForm = async (req, res, next) => {
+  await FormCustomer.deleteMany({});
+  await FormCustomer.insertMany(importCategories);
+  console.log(`✨ Inserted FormCustomer`);
 };
    
 mongoose
