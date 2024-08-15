@@ -14,7 +14,7 @@ const formCustomerSchema = new Schema(
     phone: {
       type: String,
     },
-    form: {
+    topic: {
       type: String,
     },
     // note: {
