@@ -6,7 +6,7 @@ const createForm = async (req, res, next) => {
         const { name,
           email,
           phone,
-          form } = req.body
+          topic } = req.body
 
           if (!name) {
             return res.status(500).json({
@@ -26,10 +26,10 @@ const createForm = async (req, res, next) => {
                 message: 'Validation Phone!'
             })
           }
-          if (!form) {
+          if (!topic) {
             return res.status(500).json({
                 status: 'ERR',
-                message: 'Validation Form!'
+                message: 'Validation Topic!'
             })
           }
         const response = await FormServices.createForm(req)
