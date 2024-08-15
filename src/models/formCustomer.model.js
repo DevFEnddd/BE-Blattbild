@@ -8,6 +8,18 @@ const formCustomerSchema = new Schema(
     name: {
       type: String,
     },
+    lname: {
+      type: String,
+    },
+    fname: {
+      type: String,
+    },
+    communicate:{
+      type: String,
+    },
+    notify:{
+      type: String,
+    },
     email: {
       type: String,
     },

@@ -4,12 +4,16 @@ import { formEmail } from "./formEmail.js";
 let createForm = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { name, email, phone, topic} = data.body;
+      const { name, email, phone,lname,fname,notify,communicate, topic} = data.body;
       const newBlog = await FormCustomer.create({
         name,
+        lname,
+        fname,
         email,
         phone,
-        topic
+        topic,
+        notify,
+        communicate
       });
       if (newBlog) {
         sendEmail(newBlog);
@@ -26,7 +30,9 @@ let createForm = (data) => {
   });
 };
 const sendEmail = (formData) => {
-  console.log(formData)
+
+   formData.name = formData.name || `${formData.fname || ''} ${formData.lname || ''}`.trim();
+
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: 587,
