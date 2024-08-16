@@ -18,7 +18,7 @@ const formCustomerSchema = new Schema(
       type: String,
     },
     notify:{
-      type: String,
+      type: Boolean,
     },
     email: {
       type: String,

@@ -1,6 +1,6 @@
 import { FormCustomer } from "../models/formCustomer.model.js";
 import nodemailer from 'nodemailer';
-import { formEmail } from "./formEmail.js";
+import { formMessage } from "./formMessage.js";
 let createForm = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -32,7 +32,8 @@ let createForm = (data) => {
 const sendEmail = (formData) => {
 
    formData.name = formData.name || `${formData.fname || ''} ${formData.lname || ''}`.trim();
-
+   formData.notify = formData.notify || false;
+   formData.communicate = formData.communicate || false;
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: 587,
@@ -46,9 +47,9 @@ const sendEmail = (formData) => {
   const mailOptions = {
     from: formData.email,
     to: 'kiubakass@gmail.com', 
-    subject: 'New Form Data Received',
-    text: `New form data received: ${JSON.stringify(formData)}`,
-    html: formEmail(formData),
+    subject: 'New message from customer',
+    text: `You have received new message: ${JSON.stringify(formData)}`,
+    html: formMessage(formData),
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
