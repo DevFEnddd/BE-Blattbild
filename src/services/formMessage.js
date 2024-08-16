@@ -1,6 +1,7 @@
 export const formMessage = (formData) => {
-    const notifyAndCommunicate = (formData.communicate !== 'false') ? `<p><strong>Contact by: </strong>${formData.communicate}</p>
-    <p><strong>Notification: </strong>${formData.notify ? "Yes" : "No" }</p>` : "";
+    const fullName = formData.name || formData.fname + " " + formData.lname;
+    const notifyAndCommunicate = (formData?.communicate !== 'false' && formData?.notify) ? `<p><strong>Contact by: </strong>${formData?.communicate}</p>
+    <p><strong>Notification: </strong>${formData?.notify ? "Yes" : "No" }</p>` : "";
     return `<!DOCTYPE html>
     <html lang="vi">
     <head> 
@@ -51,7 +52,7 @@ export const formMessage = (formData) => {
         <div class="container">
             <h2>Message from customer</h2>
             <div class="info">
-                <p><strong>Customer name:</strong> ${formData.name}</p>
+                <p><strong>Customer name:</strong> ${fullName}</p>
                 <p><strong>Email:</strong> ${formData.email}</p>
                 <p><strong>Phone number:</strong> ${formData.phone}</p>
                 <p><strong>Request:</strong> ${formData.topic}</p>
