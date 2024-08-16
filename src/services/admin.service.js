@@ -28,7 +28,6 @@ let loginUser = (username, password) => {
                     message: "Incorrect username!",
                 })
             }
-            console.log(user)
             let checkPassword = bcrypt.compareSync(password, user?.password);
 
             if (!checkPassword) {
