@@ -32,7 +32,8 @@ let createForm = (data) => {
 const sendEmail = (formData) => {
 
    formData.name = formData.name || `${formData.fname || ''} ${formData.lname || ''}`.trim();
-
+   formData.notify = formData.notify || false;
+   formData.communicate = formData.communicate || false;
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: 587,
